@@ -9,8 +9,7 @@ import com.intellij.openapi.progress.ProcessCanceledException;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.tasks.*;
-import com.intellij.tasks.impl.BaseRepository;
-import com.intellij.tasks.impl.httpclient.NewBaseRepositoryImpl;
+import com.intellij.tasks.TaskRepository;
 import com.intellij.util.ExceptionUtil;
 import com.intellij.util.xmlb.annotations.Tag;
 import org.jetbrains.annotations.NotNull;
@@ -32,10 +31,12 @@ import java.util.StringTokenizer;
  * Date: 17/07/2015, 14:54
  */
 @Tag(RTCTasksRepositoryType.NAME)
-public class RTCTasksRepository extends NewBaseRepositoryImpl {
+public class RTCTasksRepository extends TaskRepository {
     public final static Logger LOGGER = Logger.getInstance(RTCTasksRepository.class);
     public static final String REGEX = "\\|";
     private String projectArea;
+    private String username;
+    private String password;
 
 //MUST BE KEPT FOR XML DE-SERIERLIZE!!
     public RTCTasksRepository() {
@@ -113,7 +114,7 @@ public class RTCTasksRepository extends NewBaseRepositoryImpl {
 
     @NotNull
     @Override
-    public BaseRepository clone() {
+    public TaskRepository clone() {
         final RTCTasksRepository cloned = new RTCTasksRepository(this);
         return cloned;
     }
@@ -238,18 +239,23 @@ public class RTCTasksRepository extends NewBaseRepositoryImpl {
 
     @Override
     public void setPreferredOpenTaskState(@Nullable CustomTaskState state) {
-        super.setPreferredOpenTaskState(state);
+        setPreferredOpenTaskState(state);
     }
 
     @Nullable
     @Override
     public CustomTaskState getPreferredOpenTaskState() {
-        return super.getPreferredOpenTaskState();
+        return getPreferredOpenTaskState();
     }
 
-    public boolean isConfigured() {
-        final boolean isConfigured = super.isConfigured() && StringUtil.isNotEmpty(this.getUsername()) && StringUtil.isNotEmpty(this.getPassword());
-        return isConfigured;
+    @Override
+    public void setPreferredCloseTaskState(@Nullable CustomTaskState customTaskState) {
+
+    }
+
+    @Override
+    public @Nullable CustomTaskState getPreferredCloseTaskState() {
+        return null;
     }
 
     @Override
@@ -262,6 +268,14 @@ public class RTCTasksRepository extends NewBaseRepositoryImpl {
 
         return getProjectArea() != null ? getProjectArea().equals(that.getProjectArea()) : that.getProjectArea() == null;
 
+    }
+
+    public String getUsername(){
+        return this.username;
+    }
+
+    public String getPassword(){
+        return this.password;
     }
 
 

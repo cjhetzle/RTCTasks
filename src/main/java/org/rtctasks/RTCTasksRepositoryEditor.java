@@ -8,7 +8,7 @@ import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.tasks.config.BaseRepositoryEditor;
+import com.intellij.tasks.config.TaskRepositoryEditor;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.Consumer;
@@ -29,23 +29,29 @@ import java.util.stream.Collectors;
  * Created by exm1110B.
  * Date: 01/11/2016, 12:19
  */
-public class RTCTasksRepositoryEditor extends BaseRepositoryEditor<RTCTasksRepository> {
+public class RTCTasksRepositoryEditor extends TaskRepositoryEditor {
     private final static Logger LOGGER =Logger.getInstance(RTCTasksRepositoryEditor.class);
     private JButton getAreas;
     private JBLabel projectLabel;
     private TextFieldWithAutoCompletion  projectArea;
+    private JComponent anchor;
+    private Project myProject;
+    private RTCTasksRepository myRepository;
+    private Consumer consumer;
 
 
-    public RTCTasksRepositoryEditor(final Project project, final RTCTasksRepository repository, final Consumer<RTCTasksRepository> changeListener) {
-        super(project, repository, changeListener);
-        this.installListener(projectArea);
+    public RTCTasksRepositoryEditor(final Project project, final RTCTasksRepository repository, final Consumer<? super RTCTasksRepository> consumer) {
+        super();
+        this.myProject = project;
+        this.myRepository = repository;
+        this.consumer = consumer;
+        // this.installListener(projectArea);
         if ((this.myRepository).isConfigured()) {
             ApplicationManager.getApplication().executeOnPooledThread(() -> this.update());
         }
     }
 
     protected void afterTestConnection(boolean connectionSuccessful) {
-        super.afterTestConnection(connectionSuccessful);
         if (connectionSuccessful) {
             this.update();
         }
@@ -53,7 +59,6 @@ public class RTCTasksRepositoryEditor extends BaseRepositoryEditor<RTCTasksRepos
     }
 
     public void apply() {
-        super.apply();
         final String text = this.projectArea.getText();
         this.myRepository.setProjectArea(text);
     }
@@ -92,9 +97,13 @@ public class RTCTasksRepositoryEditor extends BaseRepositoryEditor<RTCTasksRepos
     }
 
     public void setAnchor(@Nullable JComponent anchor) {
-        super.setAnchor(anchor);
+        this.anchor = anchor;
         this.projectLabel.setAnchor(anchor);
     }
 
-    
+
+    @Override
+    public JComponent createComponent() {
+        return null;
+    }
 }
